@@ -2,9 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon copy.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ai-powered-app</title>
+    <meta name="description" content="AI Doctor Consultant – AI-powered symptom analysis. Not a substitute for medical advice." />
+    <title>AI Doctor Consultant</title>
+    <!-- Apply saved theme BEFORE first paint to avoid flash -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          var theme = stored === 'dark' || stored === 'light'
+            ? stored
+            : prefersDark ? 'dark' : 'light'
+          document.documentElement.classList.add(theme)
+        } catch (e) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
