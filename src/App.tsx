@@ -128,7 +128,7 @@ export function App() {
                 className="p-2 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
                 title="Sign out"
               >
-                <LogOut className="w-4 h-4" />
+                Logout <LogOut className="w-4 h-4" />
               </button>
             </div>
           </div>
