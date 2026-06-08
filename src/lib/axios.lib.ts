@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { ConsultationResult } from '../types/index';
 
 export const authServerAxios = axios.create({
     baseURL: `${import.meta.env.VITE_SERVER_BASE_URL}`,
@@ -16,4 +17,10 @@ export const authAPI = {
     loginWithGoogle: () => {
         window.location.href = `${import.meta.env.VITE_SERVER_BASE_URL}/auth/google`
     }
+}
+
+// Consultation APIs (protected – needs JWT cookie)
+export const consultationAPI = {
+    consult: (params: string) =>
+        authServerAxios.get<ConsultationResult>(`/api/doctor-consult?${params.toString()}`),
 }

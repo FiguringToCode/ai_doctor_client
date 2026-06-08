@@ -20,7 +20,7 @@ export function ConsultationForm() {
   const isLoading = status === 'loading'
 
   const handleSubmit = () => {
-    if (!symptoms.trim()) return
+    if (!symptoms.trim() && age) return
     dispatch(fetchConsultation({ symptoms: symptoms.trim(), age: Number(age), gender }))
   }
 

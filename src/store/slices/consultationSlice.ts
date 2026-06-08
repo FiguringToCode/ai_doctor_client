@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
+import { consultationAPI } from '../../lib/axios.lib'
 import type { ConsultationRequest, ConsultationResult, ConsultationState, HistoryEntry } from '../../types'
 
 export const fetchConsultation = createAsyncThunk<
@@ -20,9 +21,9 @@ export const fetchConsultation = createAsyncThunk<
       params.append('symptoms', symptoms as string)
     }
     
-    const res = await axios.get<ConsultationResult>(`https://ai-doctor-server.onrender.com/api/doctor-consult?${params.toString()}`)
+    const res = await consultationAPI.consult(params.toString())
     
-    if (res.status < 200 || res.status >= 300) {
+    if (res.status !== 200) {
       return rejectWithValue(`Server error ${res.status}`)
     }
     
