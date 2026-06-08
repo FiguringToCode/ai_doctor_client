@@ -1,16 +1,21 @@
 import { useEffect } from 'react'
-import { Heart, Clock } from 'lucide-react'
+import { Heart, Clock, LogOut, Loader2 } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Separator } from './components/ui/separator'
 import { ConsultationForm } from './components/ConsultationForm'
 import { ConsultationResult } from './components/ConsultationResult'
 import { HistorySidebar } from './components/HistorySidebar'
 import { ThemeToggle } from './components/ThemeToggle'
-import { useAppSelector } from './hooks/redux'
+import { Login } from './components/Login'
+import { useAppSelector, useAppDispatch } from './hooks/redux'
+import { checkAuth, logout } from './store/slices/authSlice'
 
 export function App() {
+  const dispatch = useAppDispatch()
   const historyCount = useAppSelector((s) => s.consultation.history.length)
   const theme = useAppSelector((s) => s.theme.theme)
+  const authStatus = useAppSelector((s) => s.auth.status)
+  const user = useAppSelector((s) => s.auth.user)
 
   // Apply / remove dark class on <html> whenever Redux theme changes
   useEffect(() => {
@@ -24,6 +29,38 @@ export function App() {
     }
   }, [theme])
 
+  // Check auth on mount
+  useEffect(() => {
+    dispatch(checkAuth())
+  }, [dispatch])
+
+  const handleLogout = () => {
+    dispatch(logout())
+  }
+
+  // ── Loading state ────────────────────────────────────────
+  if (authStatus === 'idle' || authStatus === 'loading') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="p-3 rounded-xl bg-teal-500/15 border border-teal-500/20">
+            <Heart className="w-6 h-6 text-teal-400 animate-pulse" />
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground/60">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Loading…</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Unauthenticated → show Login ────────────────────────
+  if (authStatus === 'unauthenticated') {
+    return <Login />
+  }
+
+  // ── Authenticated → show main app ───────────────────────
   return (
     <div className="min-h-screen bg-background text-foreground font-body">
       {/* Ambient background orbs */}
@@ -54,12 +91,45 @@ export function App() {
               Powered by AI · Not a substitute for medical advice
             </span>
 
-            {/* Spacer + theme toggle */}
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-xs text-muted-foreground/40 font-body hidden md:block select-none">
-                {theme === 'dark' ? 'Dark' : 'Light'} mode
-              </span>
-              <ThemeToggle />
+            {/* Spacer + user info + theme toggle */}
+            <div className="ml-auto flex items-center gap-3">
+              {/* User avatar & name */}
+              {user && (
+                <div className="hidden sm:flex items-center gap-2">
+                  {user.picture ? (
+                    <img
+                      src={user.picture}
+                      alt={user.name}
+                      className="w-7 h-7 rounded-full border border-border/50 object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-teal-500/15 border border-teal-500/20 flex items-center justify-center text-xs font-semibold text-teal-400">
+                      {user.name?.charAt(0)?.toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-xs text-muted-foreground/70 font-medium max-w-[120px] truncate">
+                    {user.name}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground/80 font-body hidden md:block select-none">
+                  {theme === 'dark' ? 'Dark' : 'Light'} mode
+                </span>
+                <ThemeToggle />
+              </div>
+
+              {/* Logout button */}
+              <button
+                id="logout-btn"
+                onClick={handleLogout}
+                className="p-2 rounded-lg text-muted-foreground/50 hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </header>
@@ -72,8 +142,9 @@ export function App() {
             <div className="space-y-6">
               <div className="space-y-1">
                 <h1 className="font-display text-3xl font-bold tracking-tight">
-                  Your Health,{' '}
+                  Your Health is now {' '}
                   <span className="text-teal-400">Analysed</span>
+                  {' '}by AI.
                 </h1>
                 <p className="text-sm text-muted-foreground/70 font-body max-w-lg">
                   Describe your symptoms and receive an AI-powered preliminary assessment.
@@ -129,11 +200,8 @@ export function App() {
         {/* ── Footer ───────────────────────────────────────── */}
         <footer className="border-t border-border/30 mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground/40 font-body">
+            <p className="text-xs text-muted-foreground/100 font-body">
               © {new Date().getFullYear()} AI Doctor Consultant · For informational purposes only
-            </p>
-            <p className="text-xs text-muted-foreground/30 font-mono">
-              v1.0.0 · Vite + Redux Toolkit + shadCN
             </p>
           </div>
         </footer>

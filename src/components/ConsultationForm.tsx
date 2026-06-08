@@ -14,20 +14,20 @@ export function ConsultationForm() {
   const status = useAppSelector((s) => s.consultation.status)
 
   const [symptoms, setSymptoms] = useState('')
-  const [age, setAge] = useState<string>('30')
+  const [age, setAge] = useState(0)
   const [gender, setGender] = useState<Gender>('unknown')
 
   const isLoading = status === 'loading'
 
   const handleSubmit = () => {
     if (!symptoms.trim()) return
-    dispatch(fetchConsultation({ symptoms: symptoms.trim(), age: Number(age) || 30, gender }))
+    dispatch(fetchConsultation({ symptoms: symptoms.trim(), age: Number(age), gender }))
   }
 
   const handleReset = () => {
     dispatch(reset())
     setSymptoms('')
-    setAge('30')
+    setAge(0)
     setGender('unknown')
   }
 
@@ -66,22 +66,22 @@ export function ConsultationForm() {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="age" className="text-sm font-medium text-foreground/80">
-            Age
+            Age <span className="text-teal-400">*</span>
           </Label>
           <Input
             id="age"
             type="number"
             min={1}
-            max={120}
+            max={80}
             value={age}
-            onChange={(e) => setAge(e.target.value)}
+            onChange={(e) => setAge(e.target.valueAsNumber)}
             className="bg-background/50 border-border/60 focus-visible:ring-teal-500/50 focus-visible:border-teal-500/50"
             disabled={isLoading}
           />
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-foreground/80">Gender</Label>
+          <Label className="text-sm font-medium text-foreground/80">Gender </Label>
           <Select
             value={gender}
             onValueChange={(v) => setGender(v as Gender)}
@@ -107,7 +107,7 @@ export function ConsultationForm() {
           size="lg"
           className="flex-1 font-body font-medium tracking-wide"
           onClick={handleSubmit}
-          disabled={isLoading || !symptoms.trim()}
+          disabled={isLoading || !symptoms.trim() || !age || !gender}
         >
           {isLoading ? (
             <>
