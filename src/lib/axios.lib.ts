@@ -13,7 +13,7 @@ export const authServerAxios = axios.create({
 export const authAPI = {
     getProfile: () => authServerAxios.get('/user/profile'),
     verifyToken: () => authServerAxios.get('/auth/verify'),
-    logout: () => authServerAxios.post('/auth/logout'),
+    logout: () => authServerAxios.get('/auth/logout'),
     loginWithGoogle: () => {
         window.location.href = `${import.meta.env.VITE_SERVER_BASE_URL}/auth/google`
     }
